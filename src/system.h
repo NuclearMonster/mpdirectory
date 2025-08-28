@@ -1,7 +1,7 @@
 /*
 	system.h
 
-	System specific code for dpmaster
+	System specific code for mpdirectory
 
 	Copyright (C) 2008-2011  Mathieu Olivier
 
@@ -29,16 +29,16 @@
 
 // The default name of the log file
 #ifdef WIN32
-#	define DEFAULT_LOG_FILE "dpmaster.log"
+#	define DEFAULT_LOG_FILE "mpdirectory.log"
 #else
-#	define DEFAULT_LOG_FILE "/var/log/dpmaster.log"
+#	define DEFAULT_LOG_FILE "/var/log/mpdirectory.log"
 #endif
 
 // The maximum number of listening sockets
 #define MAX_LISTEN_SOCKETS 8
 
-// Default master port
-#define DEFAULT_MASTER_PORT 27950
+// Default directory port
+#define DEFAULT_MPDIRECTORY_PORT 27950
 
 // Network errors code
 #ifdef WIN32
@@ -102,7 +102,7 @@ extern unsigned int nb_sockets;
 extern listen_socket_t listen_sockets [MAX_LISTEN_SOCKETS];
 
 // The port we use dy default
-extern unsigned short master_port;
+extern unsigned short directory_port;
 
 // System specific command line options
 extern const cmdlineopt_t sys_cmdline_options [];

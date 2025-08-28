@@ -12,14 +12,14 @@ use Socket6;
 use Time::HiRes qw(time sleep);
 
 
-# Constants - dpmaster
-use constant DEFAULT_DPMASTER_PATH => "../src/dpmaster";
+# Constants - mpdirectory
+use constant DEFAULT_MPDIRECTORY_PATH => "../src/mpdirectory";
 use constant IPV4_LOOPBACK_ADDRESS => "127.0.0.1";
 use constant IPV6_LOOPBACK_ADDRESS => "::1";
-use constant DEFAULT_DPMASTER_PORT => 27950;
+use constant DEFAULT_MPDIRECTORY_PORT => 27950;
 
 # Constants - game properties
-use constant DEFAULT_GAMENAME => "DpmasterTest";
+use constant DEFAULT_GAMENAME => "MpdirectoryTest";
 use constant DEFAULT_PROTOCOL => 5;
 use constant QUAKE3ARENA_GAMENAME => "Quake3Arena";
 use constant QUAKE3ARENA_PROTOCOL => 67;
@@ -39,9 +39,9 @@ use constant {
 };
 
 
-# Global variables - dpmaster
-my $dpmasterPid = undef;
-my %dpmasterProperties = (
+# Global variables - mpdirectory
+my $mpdirectoryPid = undef;
+my %mpdirectoryProperties = (
 	exitvalue => undef,
 	remoteAddress => undef,
 
@@ -52,7 +52,7 @@ my %dpmasterProperties = (
 	hashPorts => 1,
 	maxNbServers => undef,
 	maxNbServersPerAddr => undef,
-	port => DEFAULT_DPMASTER_PORT,
+	port => DEFAULT_MPDIRECTORY_PORT,
 	extraCmdlineOptions => [],
 );
 
@@ -75,8 +75,8 @@ my @failureDiagnostic = ();
 
 # Command-line options
 my $optVerbose = 0;
-my $optDpmasterOutput = 0;
-my $optDpmasterPath = DEFAULT_DPMASTER_PATH;
+my $optMpdirectoryOutput = 0;
+my $optMpdirectoryPath = DEFAULT_MPDIRECTORY_PATH;
 
 
 #***************************************************************************
@@ -93,8 +93,8 @@ BEGIN {
 		&Client_SetGameProperty
 		&Client_SetProperty
 
-		&Master_GetProperty
-		&Master_SetProperty
+		&Directory_GetProperty
+		&Directory_SetProperty
 
 		&Server_GetGameProperty
 		&Server_New
@@ -118,8 +118,8 @@ INIT {
 	# Parse the options
 	GetOptions (
 		"verbose" => \$optVerbose,
-		"dpmaster-output" => \$optDpmasterOutput,
-		"dpmaster-path=s" => \$optDpmasterPath,
+		"mpdirectory-output" => \$optMpdirectoryOutput,
+		"mpdirectory-path=s" => \$optMpdirectoryPath,
 	);
 
 	# Install the signal handler
@@ -155,8 +155,8 @@ sub Common_CreateSocket {
 	}
 
 	my ($connectAddr, $bindAddr);
-	if ($dpmasterProperties{remoteAddress}) {
-		$connectAddr = $dpmasterProperties{remoteAddress};
+	if ($mpdirectoryProperties{remoteAddress}) {
+		$connectAddr = $mpdirectoryProperties{remoteAddress};
 		$bindAddr = "";
 	}
 	else {
@@ -165,12 +165,12 @@ sub Common_CreateSocket {
 	}
 
 	# Build the address for connect()
-	my @res = getaddrinfo ($connectAddr, $dpmasterProperties{port}, $family, SOCK_DGRAM, $proto, 0);
+	my @res = getaddrinfo ($connectAddr, $mpdirectoryProperties{port}, $family, SOCK_DGRAM, $proto, 0);
 	if (scalar @res < 5) {
 		die "Can't resolve address \"$connectAddr\" (port: $port)";
 	}
-	my ($sockType, $dpmasterAddr, $canonName);
-	($family, $sockType, $proto, $dpmasterAddr, $canonName, @res) = @res;
+	my ($sockType, $mpdirectoryAddr, $canonName);
+	($family, $sockType, $proto, $mpdirectoryAddr, $canonName, @res) = @res;
 
 	# Build the address for bind()
 	@res = getaddrinfo ($bindAddr, $port, $family, SOCK_DGRAM, $proto, AI_PASSIVE);
@@ -187,8 +187,8 @@ sub Common_CreateSocket {
 	# Bind it to the port
 	bind ($socket, $addr) or die "Can't bind to port $port: $!\n";
 
-	# Connect the socket to the dpmaster address
-	connect ($socket, $dpmasterAddr) or die "Can't connect to the dpmaster address: $!\n";
+	# Connect the socket to the mpdirectory address
+	connect ($socket, $mpdirectoryAddr) or die "Can't connect to the mpdirectory address: $!\n";
 
 	# Make the IOs from this socket non-blocking
 	Common_SetNonBlockingIO($socket);
@@ -658,7 +658,7 @@ sub Client_ValidateGetServers {
 sub Master_IsGameAccepted {
 	my $gamename = shift;
 	
-	my $gamePolicy = $dpmasterProperties{gamePolicy};
+	my $gamePolicy = $mpdirectoryProperties{gamePolicy};
 	if (not defined ($gamePolicy)) {
 		return 1;
 	}
@@ -688,14 +688,14 @@ sub Master_IsGameAccepted {
 # Master_Run
 #***************************************************************************
 sub Master_Run {
-	# If we use a remote master, there's nothing to do
-	if ($dpmasterProperties{remoteAddress}) {
+	# If we use a remote directory, there's nothing to do
+	if ($mpdirectoryProperties{remoteAddress}) {
 		return;
 	}
 
-	# Print the master server output
+	# Print the directory server output
 	while (<DPMASTER_PROCESS>) {
-		if ($optDpmasterOutput) {
+		if ($optMpdirectoryOutput) {
 			Common_VerbosePrint ("[DPM] $_");
 		}
 	}
@@ -708,14 +708,14 @@ sub Master_Run {
 sub Master_GetProperty {
 	my $propertyName = shift;
 	
-	return $dpmasterProperties{$propertyName};
+	return $mpdirectoryProperties{$propertyName};
 }
 
 	
 #***************************************************************************
-# Master_SetProperty
+# Directory_SetProperty
 #***************************************************************************
-sub Master_SetProperty {
+sub Directory_SetProperty {
 	my $propertyName = shift;
 	my $propertyValue = shift;
 	
@@ -723,15 +723,15 @@ sub Master_SetProperty {
 	if ($propertyName eq "gamePolicy" and defined $propertyValue) {
 		my $policy = $propertyValue->{policy};
 		if ($policy ne "accept" and $policy ne "reject") {
-			die "Master_SetProperty: Invalid game policy \"$policy\" (must be \"accept\" or \"reject\")";
+			die "Directory_SetProperty: Invalid game policy \"$policy\" (must be \"accept\" or \"reject\")";
 		}
 		
 		if (scalar @{$propertyValue->{gamenames}} <= 0) {
-			die "Master_SetProperty: no game names specified for the game policy";
+			die "Directory_SetProperty: no game names specified for the game policy";
 		}
 	}
 
-	$dpmasterProperties{$propertyName} = $propertyValue;
+	$mpdirectoryProperties{$propertyName} = $propertyValue;
 }
 
 
@@ -739,64 +739,64 @@ sub Master_SetProperty {
 # Master_Start
 #***************************************************************************
 sub Master_Start {
-	# If we use a remote master, there's nothing to do
-	if ($dpmasterProperties{remoteAddress}) {
+	# If we use a remote directory, there's nothing to do
+	if ($mpdirectoryProperties{remoteAddress}) {
 		return;
 	}
 	
-	my $dpmasterCmdLine = $optDpmasterPath . " -p $dpmasterProperties{port}";
+	my $mpdirectoryCmdLine = $optMpdirectoryPath . " -p $mpdirectoryProperties{port}";
 	
-	if ($optDpmasterOutput) {
-		$dpmasterCmdLine .= " -v";
+	if ($optMpdirectoryOutput) {
+		$mpdirectoryCmdLine .= " -v";
 	}
 	
-	if (defined $dpmasterProperties{maxNbServers}) {
-		$dpmasterCmdLine .= " -n $dpmasterProperties{maxNbServers}";
+	if (defined $mpdirectoryProperties{maxNbServers}) {
+		$mpdirectoryCmdLine .= " -n $mpdirectoryProperties{maxNbServers}";
 	}
 	
-	if (defined $dpmasterProperties{floodProtectionThrottle}) {
-		$dpmasterCmdLine .= " -f --fp-throttle $dpmasterProperties{floodProtectionThrottle}";
+	if (defined $mpdirectoryProperties{floodProtectionThrottle}) {
+		$mpdirectoryCmdLine .= " -f --fp-throttle $mpdirectoryProperties{floodProtectionThrottle}";
 	}
 	
 	# "--hash-ports" and "-N" are mutually incompatible options
-	if (defined $dpmasterProperties{maxNbServersPerAddr}) {
-		$dpmasterCmdLine .= " -N $dpmasterProperties{maxNbServersPerAddr}";
+	if (defined $mpdirectoryProperties{maxNbServersPerAddr}) {
+		$mpdirectoryCmdLine .= " -N $mpdirectoryProperties{maxNbServersPerAddr}";
 	}
 	else {
-		if ($dpmasterProperties{hashPorts}) {
-			$dpmasterCmdLine .= " --hash-ports";
+		if ($mpdirectoryProperties{hashPorts}) {
+			$mpdirectoryCmdLine .= " --hash-ports";
 		}
 	}
 	
-	if ($dpmasterProperties{allowLoopback}) {
-		$dpmasterCmdLine .= " --allow-loopback";
+	if ($mpdirectoryProperties{allowLoopback}) {
+		$mpdirectoryCmdLine .= " --allow-loopback";
 	}
 	
-	my $gamePolicyRef = $dpmasterProperties{gamePolicy};
+	my $gamePolicyRef = $mpdirectoryProperties{gamePolicy};
 	if (defined $gamePolicyRef) {
-		$dpmasterCmdLine .= " --game-policy $gamePolicyRef->{policy}";
+		$mpdirectoryCmdLine .= " --game-policy $gamePolicyRef->{policy}";
 		foreach my $gamename (@{$gamePolicyRef->{gamenames}}) {
-			$dpmasterCmdLine .= " $gamename";
+			$mpdirectoryCmdLine .= " $gamename";
 		}
 	}
 	
-	my $extraOptionsRef = $dpmasterProperties{extraOptions};
+	my $extraOptionsRef = $mpdirectoryProperties{extraOptions};
 	if (defined $extraOptionsRef) {
 		foreach my $extraOption (@{$extraOptionsRef}) {
-			$dpmasterCmdLine .= " $extraOption";
+			$mpdirectoryCmdLine .= " $extraOption";
 		}
 	}
 
-	Common_VerbosePrint ("Launching dpmaster as: $dpmasterCmdLine\n");
-	$dpmasterPid = open DPMASTER_PROCESS, "$dpmasterCmdLine |";
-	if (not defined $dpmasterPid) {
-	   die "Can't run dpmaster: $!\n";
+	Common_VerbosePrint ("Launching mpdirectory as: $mpdirectoryCmdLine\n");
+	$mpdirectoryPid = open DPMASTER_PROCESS, "$mpdirectoryCmdLine |";
+	if (not defined $mpdirectoryPid) {
+	   die "Can't run mpdirectory: $!\n";
 	}
 
-	# Make the IOs from dpmaster's pipe non-blocking
+	# Make the IOs from mpdirectory's pipe non-blocking
 	Common_SetNonBlockingIO(\*DPMASTER_PROCESS);
 	
-	# Wait for the master to be ready
+	# Wait for the directory to be ready
 	# TODO: find a better way to do this
 	sleep (0.5);
 }
@@ -806,15 +806,15 @@ sub Master_Start {
 # Master_Stop
 #***************************************************************************
 sub Master_Stop {
-	# If we use a remote master, there's nothing to do
-	if ($dpmasterProperties{remoteAddress}) {
+	# If we use a remote directory, there's nothing to do
+	if ($mpdirectoryProperties{remoteAddress}) {
 		return;
 	}
 
-	# Kill dpmaster if it's still running
-	if (defined ($dpmasterPid)) {
-		kill ("HUP", $dpmasterPid);
-		$dpmasterPid = undef;
+	# Kill mpdirectory if it's still running
+	if (defined ($mpdirectoryPid)) {
+		kill ("HUP", $mpdirectoryPid);
+		$mpdirectoryPid = undef;
 	}
 
 	# Close the pipe
@@ -853,26 +853,26 @@ sub Server_New {
 
 
 	# Game family specific variables
-	my ($gamename, $protocol, $masterProtocol);
+	my ($gamename, $protocol, $directoryProtocol);
 	if ($gameFamily == GAME_FAMILY_QUAKE3ARENA) {
 		$gamename = QUAKE3ARENA_GAMENAME;
 		$protocol = QUAKE3ARENA_PROTOCOL;
-		$masterProtocol = "QuakeArena-1";
+		$directoryProtocol = "QuakeArena-1";
 	}
 	elsif ($gameFamily == GAME_FAMILY_RTCW) {
 		$gamename = RTCW_GAMENAME;
 		$protocol = RTCW_PROTOCOL;
-		$masterProtocol = "Wolfenstein-1";
+		$directoryProtocol = "Wolfenstein-1";
 	}
 	elsif ($gameFamily == GAME_FAMILY_WOET) {
 		$gamename = WOET_GAMENAME;
 		$protocol = WOET_PROTOCOL;
-		$masterProtocol = "EnemyTerritory-1";
+		$directoryProtocol = "EnemyTerritory-1";
 	}
 	else {  # $gameFamily == GAME_FAMILY_DARKPLACES
 		$gamename = DEFAULT_GAMENAME;
 		$protocol = DEFAULT_PROTOCOL;
-		$masterProtocol = "DarkPlaces";
+		$directoryProtocol = "DarkPlaces";
 	}
 
 	my $newServer = {
@@ -881,7 +881,7 @@ sub Server_New {
 		state => undef,  # undef -> Init -> WaitingGetInfos -> Done
 		heartbeatTime => undef,
 		port => $port,
-		masterProtocol => $masterProtocol,
+		directoryProtocol => $directoryProtocol,
 		socket => undef,
 		cannotBeRegistered => 0,
 		cannotBeAnswered => 0,
@@ -929,7 +929,7 @@ sub Server_Run {
 				Common_VerbosePrint ("Server $serverRef->{id} received a getinfo with challenge \"$challenge\"\n");
 				
 				if ($serverRef->{cannotBeAnswered}) {
-					push @failureDiagnostic, "Server_Run: server $serverRef->{id} got a getinfo message when it should have been ignored by the master";
+					push @failureDiagnostic, "Server_Run: server $serverRef->{id} got a getinfo message when it should have been ignored by the directory";
 					$mustExit = 1;
 				}
 
@@ -962,11 +962,11 @@ sub Server_SendHeartbeat {
 	my $serverRef = shift;
 
 	Common_VerbosePrint ("Sending heartbeat from server $serverRef->{id}\n");
-	my $heartbeat = "\xFF\xFF\xFF\xFFheartbeat $serverRef->{masterProtocol}\x0A";
+	my $heartbeat = "\xFF\xFF\xFF\xFFheartbeat $serverRef->{directoryProtocol}\x0A";
 	send ($serverRef->{socket}, $heartbeat, 0) or die "Can't send packet: $!";
 	
 	if (not $serverRef->{cannotBeAnswered}) {
-		$serverRef->{cannotBeAnswered} = not $dpmasterProperties{allowLoopback};
+		$serverRef->{cannotBeAnswered} = not $mpdirectoryProperties{allowLoopback};
 		if ($serverRef->{cannotBeAnswered}) {
 			Common_VerbosePrint ("server cannot be answered: no servers allowed on loopback interfaces\n");
 		}
@@ -1202,13 +1202,13 @@ sub Test_Run {
 
 		Test_RunAll ();
 
-		# Unless we use a remote master
-		unless ($dpmasterProperties{remoteAddress}) {
-			# If the dpmaster process is dead
-			if (waitpid($dpmasterPid, WNOHANG) == $dpmasterPid) {
+		# Unless we use a remote directory
+		unless ($mpdirectoryProperties{remoteAddress}) {
+			# If the mpdirectory process is dead
+			if (waitpid($mpdirectoryPid, WNOHANG) == $mpdirectoryPid) {
 				$exitValue = $? >> 8;
 				my $receivedSignal = $? & 127;
-				Common_VerbosePrint ("Dpmaster end status: $? (exit value = $exitValue, received signal = $receivedSignal)...\n");
+				Common_VerbosePrint ("Mpdirectory end status: $? (exit value = $exitValue, received signal = $receivedSignal)...\n");
 				last;
 			}
 		}
@@ -1219,10 +1219,10 @@ sub Test_Run {
 
 	my $Result = EXIT_SUCCESS;
 
-	# Unless we use a remote master
-	unless ($dpmasterProperties{remoteAddress}) {
-		# If the dpmaster process is in the expected state
-		my $expectedExitValue = $dpmasterProperties{exitvalue};
+	# Unless we use a remote directory
+	unless ($mpdirectoryProperties{remoteAddress}) {
+		# If the mpdirectory process is in the expected state
+		my $expectedExitValue = $mpdirectoryProperties{exitvalue};
 		if ((defined ($expectedExitValue) != defined ($exitValue)) or
 			(defined ($expectedExitValue) and defined ($exitValue) and $expectedExitValue != $exitValue)) {
 			$Result = EXIT_FAILURE;
@@ -1235,7 +1235,7 @@ sub Test_Run {
 			{
 				$state = "running";
 			}
-			push @failureDiagnostic, "The dpmaster process is in an unexpected state ($state)";
+			push @failureDiagnostic, "The mpdirectory process is in an unexpected state ($state)";
 		}
 	}
 

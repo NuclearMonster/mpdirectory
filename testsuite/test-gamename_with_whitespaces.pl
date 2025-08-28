@@ -4,7 +4,7 @@ use strict;
 use testlib;
 
 
-my $gamename = "Dpmaster Test";
+my $gamename = "Mpdirectory Test";
 
 my $serverRef = Server_New ();
 Server_SetGameProperty ($serverRef, "gamename", $gamename);

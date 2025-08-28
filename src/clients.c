@@ -1,7 +1,7 @@
 /*
 	clients.c
 
-	Client list and flood protection for dpmaster
+	Client list and flood protection for mpdirectory
 
 	Copyright (C) 2010  Timothee Besset
 	Copyright (C) 2010-2011  Mathieu Olivier

@@ -1,5 +1,5 @@
 
-                         Dpmaster, an open master server
+                         Mpdirectory, an open directory server
                          -------------------------------
 
                               Technical information
@@ -15,7 +15,7 @@
 
 1) COMPILING DPMASTER:
 
-Dpmaster is known to compile successfully on GCC, MinGW (GCC for Windows), and
+Mpdirectory is known to compile successfully on GCC, MinGW (GCC for Windows), and
 Microsoft Visual Studio 8. You can also cross-compile it to Windows using MinGW.
 
 Here are the commands you will have to run, depending on your system.
@@ -71,7 +71,7 @@ Here are the commands you will have to run, depending on your system.
     4) Building on Windows using Microsoft Visual Studio:
 
         No command line here. Open the project by double-clicking on
-        "dpmaster.sln". Choose the configuration you want, either "Debug" or
+        "dpdirectory.sln". Choose the configuration you want, either "Debug" or
         "Release". Then go to the "Build" menu and click on "Build solution".
 
         You'll find the executable file in a newly created subdirectory, called
@@ -81,19 +81,19 @@ Here are the commands you will have to run, depending on your system.
 2) USING DPMASTER WITH YOUR GAME:
 
 This section is a summary of what you have to do in your game code in order to
-use a running instance of dpmaster as a master server for your game. A more
+use a running instance of dpdirectory as a directory server for your game. A more
 complete description of the protocol can be found in the next section.
 
 Let's say we have nearly finished coding a brand new real-time strategy game
 "BattleArt 3". The network code is working, but players have to manually enter
 IP addresses to play with their friends on the internet. Obviously, it needs a
-master server to keep track of the game sessions.
+directory server to keep track of the game sessions.
 
 On the server side (the side of the player who has created the session and is
 waiting for other players), you have to declare the game session. To do that,
-the server must send an "heartbeat" message to the master, which will reply by
+the server must send an "heartbeat" message to the directory, which will reply by
 sending back a "getinfo" message containing a password (a "challenge"). The
-server will then send the master an "infoResponse" message, containing this
+server will then send the directory an "infoResponse" message, containing this
 password plus a few pieces of information about its session: the maximum number
 of players it can accept, the number of players currently in the game, the
 number of the network protocol it uses, and of course the game name.
@@ -120,18 +120,18 @@ values shouldn't change once a particular session has been declared.
 
 We are now done with the server side, let's see the client side.
 
-It's easier here: the client simply sends to the master a "getserversExt"
+It's easier here: the client simply sends to the directory a "getserversExt"
 message containing the game name and the protocol number it uses, and optionally
 some filtering options. So for "BattleArt 3", we would have something like:
 
     "\xFF\xFF\xFF\xFFgetserversExt BattleArt3 5"
 
-By default, dpmaster doesn't send empty or full servers. We are not interested
+By default, mpdirectory doesn't send empty or full servers. We are not interested
 by full servers anyway, and an empty server would actually mean that the session
 no longer exists. Since we have no "gametype" to specify either, there is no
 filtering options to append to this message.
 
-The master will reply by sending the client the IP addresses of all the servers
+The directory will reply by sending the client the IP addresses of all the servers
 matching these criteria (see the syntax of the "getserversExtResponse" message
 in the "PROTOCOL" section). The last thing the client has to do now is to
 contact the various servers individually, so it can retrieve the additional
@@ -141,7 +141,7 @@ for instance).
 
 3) PROTOCOL:
 
-Dpmaster uses a protocol that is heavily inspired by Quake III Arena's master
+Mpdirectory uses a protocol that is heavily inspired by Quake III Arena's directory
 server protocol. The reference document for this protocol can be found on id
 Software anonymous FTP site:
 
@@ -150,14 +150,14 @@ Software anonymous FTP site:
 I have tried to keep the protocol as close as possible to Q3A's one, for a
 matter of compatibility with the numerous tools that exist for this game.
 
-Dpmaster uses 5 types of messages, plus 2 extra types for supporting IPv6, the
+Mpdirectory uses 5 types of messages, plus 2 extra types for supporting IPv6, the
 successor of the current internet protocol IPv4. The 5 basic types are:
 "heartbeat", "getinfo", "infoResponse", "getservers" and "getserversResponse".
 The 2 extra types are "getserversExt" and "getserversExtResponse", 2 extended
 versions of the basic types "getservers" and "getserversResponse" respectively.
 The first 3 basic types are used by servers to authenticate and register
-themselves to a master server. The remaining types are used by clients to
-retrieve a list of servers from a master server. All messages start with 4 bytes
+themselves to a directory server. The remaining types are used by clients to
+retrieve a list of servers from a directory server. All messages start with 4 bytes
 set to 0xFF (character 255), then the command type in plain text.
 
 The 2 basic types of messages which are likely to cause compliance problems with
@@ -172,10 +172,10 @@ in the infostring.
         - description:
 
             The heartbeat is sent by a server when it wants to get noticed by a
-            master. A server should send an heartbeat each time it becomes empty
+            directory. A server should send an heartbeat each time it becomes empty
             or full, or stop being empty or full, plus it should make sure the 
-            master gets at least one heartbeat from it every 10 or 15 minutes,
-            so the master doesn't remove it from its list of active servers.
+            directory gets at least one heartbeat from it every 10 or 15 minutes,
+            so the directory doesn't remove it from its list of active servers.
 
         - samples:
 
@@ -190,14 +190,14 @@ in the infostring.
             (character 10, '\n') closes the message. Note that the string after
             the type name is a PROTOCOL STRING, not a game string! Please make
             sure you use "DarkPlaces" as your protocol string if you use
-            dpmaster for your own game, or it won't work!
+            mpdirectory for your own game, or it won't work!
 
     2) getinfo:
 
         - description:
 
-            This message is sent by a master to a server, usually in response
-            to an "hearbeat" by this very server. It is used by the master to
+            This message is sent by a directory to a server, usually in response
+            to an "hearbeat" by this very server. It is used by the directory to
             trigger the sending of an "infoResponse" from the server. The
             challenge string is necessary to authenticate the server's
             corresponding "infoResponse".
@@ -231,7 +231,7 @@ in the infostring.
             separated by '\'s. Popular keys include "hostname" (the host name),
             and "mapname" (the map currently played on this server).
             This infostring must contain the challenge string sent by the
-            master in the "getinfo" that triggered this response (key name:
+            directory in the "getinfo" that triggered this response (key name:
             "challenge"). "sv_maxclients" (the maximum number of clients
             allowed on the server; must not be 0), "protocol" (the protocol
             number) and "clients" (the current number of clients on the
@@ -239,7 +239,7 @@ in the infostring.
             "gamename" (the game name) is mandatory too, and its value must not
             contain whitespaces.
             
-            Starting from version 2.0, dpmaster also uses the value of the
+            Starting from version 2.0, mpdirectory also uses the value of the
             "gametype" key, which may be specified as a filter in server list
             queries (see the "getservers" message description below for more
             details). If no "gametype" key is present in the response message,
@@ -251,9 +251,9 @@ in the infostring.
 
         - description:
 
-             A "getservers" message is sent to a master by a client who wants
+             A "getservers" message is sent to a directory by a client who wants
              to get a list of servers. It triggers a "getserversReponse"
-             message from the master.
+             message from the directory.
 
         - samples:
 
@@ -272,7 +272,7 @@ in the infostring.
             games such as Q3A or RtCW don't, obviously. Game names must not
             contain whitespace characters.
 
-            Starting from dpmaster version 2.0, you may also add in the option
+            Starting from mpdirectory version 2.0, you may also add in the option
             list at most one gametype filter "gametype=X", where X is the
             gametype string a server must have declared to be part of the
             returned server list. 4 other keywords are allowed as shortcuts to
@@ -301,24 +301,24 @@ in the infostring.
             sent as: "\x01\x02\x03\x04\x08\x00".
             
             If the list is too big to fit into one single network packet,
-            dpmaster will create as many getserversResponses as necessary to 
+            mpdirectory will create as many getserversResponses as necessary to 
             send all the matching servers. The last message contains a fake
             server at the end of the list, which is the 6-byte string
-            "EOT\0\0\0", to tell the client that the master has finished to send
+            "EOT\0\0\0", to tell the client that the directory has finished to send
             the server list (EOT stands for "End Of Transmission").
 
-            Prior to version 2.0, dpmaster ended all its getserversResponse
+            Prior to version 2.0, mpdirectory ended all its getserversResponse
             messages with an EOT mark, even when multiple messages were required
-            for a single response. Dpmaster 2.0 fixed this, allowing for smarter
+            for a single response. Mpdirectory 2.0 fixed this, allowing for smarter
             handling of the reponse messages on the client side.
 
     6) getserversExt:
 
         - description:
 
-            A "getserversExt" message is sent to a master by a client who wants
+            A "getserversExt" message is sent to a directory by a client who wants
             to get a list of servers. It triggers a "getserversExtReponse"
-            message from the master.
+            message from the directory.
 
         - sample:
 
@@ -332,7 +332,7 @@ in the infostring.
             "gametype=X" and its shortcuts) are currently supported, plus 2
             other ones: "ipv4" and "ipv6" to ask specifically for servers using
             this/these protocol(s). If no protocol name appears in the list, the
-            master server won't filter the servers by protocol, behaving in
+            directory server won't filter the servers by protocol, behaving in
             practice as if all protocols appeared in the list.
 
             As you can see in this sample, since the game name is mandatory in
@@ -365,30 +365,30 @@ in the infostring.
             "\x01\x02\x03\x04\x08\x00".
             
             If the list is too big to fit into one single network packet,
-            dpmaster will create as many getserversResponses as necessary to 
+            mpdirectory will create as many getserversResponses as necessary to 
             send all the matching servers. The last message contains a fake IPv4
             address at the end of the list, which is the 6-byte string
-            "EOT\0\0\0", to tell the client that the master has finished to send
+            "EOT\0\0\0", to tell the client that the directory has finished to send
             the server list (EOT stands for "End Of Transmission").
 
 
 4) BEHAVIOUR:
 
-The way dpmaster behaves when talking to clients and servers is largely based
+The way mpdirectory behaves when talking to clients and servers is largely based
 on one important idea: authenticated "infoResponse" messages are the only
 messages we can reasonably trust.
 
-When dpmaster receives an "heartbeat" message from a server, it will reply with
+When mpdirectory receives an "heartbeat" message from a server, it will reply with
 a "getinfo" and register this server for a couple of seconds. If it hasn't sent
 back an "infoResponse" containing a valid challenge string by this time,
-dpmaster forgets it. Further "heartbeat" messages can't prolong this time,
+mpdirectory forgets it. Further "heartbeat" messages can't prolong this time,
 and the server IP address won't be transmitted to any client during that period
 of time.
 
-When dpmaster receives a valid "infoResponse" from a server, it associates a new
+When mpdirectory receives a valid "infoResponse" from a server, it associates a new
 timeout value to it (15 min). Only another valid "infoResponse" from this very
 server will be able to refresh this timeout value. Its IP address will be
-transmitted to the appropriate clients, until it timeouts. Then, dpmaster
+transmitted to the appropriate clients, until it timeouts. Then, mpdirectory
 forgets it.
 
 You may have noticed that this behaviour doesn't take into account the fact
@@ -400,17 +400,17 @@ making it free from any major abuse.
 5) THE TEST SUITE:
 
 The collection of Perl scripts that you can find in the "testsuite" directory,
-next to the source subdirectory, is used to do some basic tests on dpmaster,
+next to the source subdirectory, is used to do some basic tests on mpdirectory,
 mostly to avoid regressions. All those simple scripts use a more complicated,
 common Perl module: "testlib.pm". This module can create fake game clients and
 servers, and make them exchange network messages with a running instance of
-dpmaster.
+mpdirectory.
 
 This suite is an imperfect solution to a complicated problem: how to test a
-master server with a single computer, without starting by hand several servers
+directory server with a single computer, without starting by hand several servers
 and clients of various games. It's still a work in progress, but it has already
 proven extremely useful in guaranteeing a minimum stability and quality when
-modifying dpmaster's source code.
+modifying mpdirectory's source code.
 
 The syntax of the test scripts themselves is pretty simple, so despite the fact
 that this suite isn't yet documented, you should be able to write your own tests

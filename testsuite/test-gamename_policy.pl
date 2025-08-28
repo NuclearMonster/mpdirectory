@@ -5,7 +5,7 @@ use testlib;
 
 
 for (my $i = 0; $i < 4; $i++) {
-	my $gameName = "dpmasterTest" . ($i + 1);
+	my $gameName = "mpdirectoryTest" . ($i + 1);
 
 	# Create the server
 	my $serverRef = Server_New ();
@@ -21,24 +21,25 @@ for (my $i = 0; $i < 4; $i++) {
 my %gamePolicy = (
 	policy => "accept",
 	gamenames => [
-		"dpmasterTest1",
-		"dpmasterTest2",
-		"dpmasterTest5",
-		"dpmasterTest6",
+		"mpdirectoryTest1",
+		"mpdirectoryTest2",
+		"mpdirectoryTest5",
+		"mpdirectoryTest6",
 	],
 );
-Master_SetProperty ("gamePolicy", \%gamePolicy);
+Directory_SetProperty ("gamePolicy", \%gamePolicy);
 Test_Run ("Game policy using \"accept\"");
 
 
 %gamePolicy = (
 	policy => "reject",
 	gamenames => [
-		"dpmasterTest1",
-		"dpmasterTest2",
-		"dpmasterTest5",
-		"dpmasterTest6",
+		"mpdirectoryTest1",
+		"mpdirectoryTest2",
+		"mpdirectoryTest5",
+		"mpdirectoryTest6",
 	],
 );
-Master_SetProperty ("gamePolicy", \%gamePolicy);
+Directory_SetProperty ("gamePolicy", \%gamePolicy);
 Test_Run ("Game policy using \"reject\"");
+

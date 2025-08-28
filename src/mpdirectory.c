@@ -1,8 +1,8 @@
 
 /*
-	dpmaster.c
+	mpdirectory.c
 
-	An open master server
+	An open directory server
 
 	Copyright (C) 2002-2011  Mathieu Olivier
 
@@ -33,8 +33,8 @@
 
 // ---------- Constants ---------- //
 
-// Version of dpmaster
-#define VERSION "2.2"
+// Version of mpdirectory
+#define VERSION "2.3"
 
 
 // ---------- Private variables ---------- //
@@ -307,7 +307,7 @@ static void PrintBanner (void)
 	{
 		Com_Printf (MSG_NORMAL,
 					"\n"
-					"dpmaster, an open master server\n"
+					"mpdirectory, an open directory server\n"
 					"(version: " VERSION ", compiled: " __DATE__ " at " __TIME__ ")\n");
 
 		banner_printed = true;
@@ -514,7 +514,7 @@ static cmdline_status_t Cmdline_Option (const cmdlineopt_t* opt, const char** pa
 		if (end_ptr == start_ptr || *end_ptr != '\0' || port_num == 0)
 			return CMDLINE_STATUS_INVALID_OPT_PARAMS;
 
-		master_port = port_num;
+		directory_port = port_num;
 	}
 
 	// Verbose level
@@ -877,7 +877,7 @@ Print the command line syntax and the available options
 */
 static void PrintHelp (void)
 {
-	Com_Printf (MSG_ERROR, "\nSyntax: dpmaster [options]\n\n");
+	Com_Printf (MSG_ERROR, "\nSyntax: mpdirectory [options]\n\n");
 
 	PrintCmdlineOptionsHelp ("cross-platform", cmdline_options);
 	PrintCmdlineOptionsHelp ("platform-specific", sys_cmdline_options);

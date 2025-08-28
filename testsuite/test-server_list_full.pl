@@ -4,7 +4,7 @@ use strict;
 use testlib;
 
 
-Master_SetProperty ("maxNbServers", 2);
+Directory_SetProperty ("maxNbServers", 2);
 
 # The 2 first servers should be accepted
 my $server1Ref = Server_New ();

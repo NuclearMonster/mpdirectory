@@ -1,7 +1,7 @@
 /*
 	games.c
 
-	Games management for dpmaster
+	Games management for mpdirectory
 
 	Copyright (C) 2009-2010  Mathieu Olivier
 
@@ -84,7 +84,7 @@ static qboolean Game_Find (const char* game_name, unsigned int* index_ptr)
 ====================
 Game_DeclarePolicy
 
-Declare the server policy regarding which games are allowed on this master
+Declare the server policy regarding which games are allowed on this directory
 ====================
 */
 cmdline_status_t Game_DeclarePolicy (const char* policy, const char** games, unsigned int nb_games)
@@ -137,7 +137,7 @@ cmdline_status_t Game_DeclarePolicy (const char* policy, const char** games, uns
 ====================
 Game_IsAccepted
 
-Return true if the game is allowed on this master
+Return true if the game is allowed on this directory
 ====================
 */
 qboolean Game_IsAccepted (const char* game_name)

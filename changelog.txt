@@ -1,10 +1,12 @@
 
-                         Dpmaster, an open master server
+                         mpdirectory, an open directory server
                          -------------------------------
 
                                 Version history
                                 ---------------
 
+* Version 2.3:
+ - Mild rebranding. All credit to previous authors.
 
 * Version 2.2:
   - Flood protection against abusive clients, by Timothee Besset

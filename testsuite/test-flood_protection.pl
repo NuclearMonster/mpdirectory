@@ -4,8 +4,8 @@ use strict;
 use testlib;
 
 
-Master_SetProperty ("floodProtectionThrottle", 4);
-Master_SetProperty ("hashPorts", 0);
+Directory_SetProperty ("floodProtectionThrottle", 4);
+Directory_SetProperty ("hashPorts", 0);
 
 my $serverRef = Server_New ();
 

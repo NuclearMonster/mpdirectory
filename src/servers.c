@@ -1,7 +1,7 @@
 /*
 	servers.c
 
-	Server list and address mapping management for dpmaster
+	Server list and address mapping management for mpdirectory
 
 	Copyright (C) 2004-2011  Mathieu Olivier
 

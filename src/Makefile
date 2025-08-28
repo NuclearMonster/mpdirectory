@@ -1,13 +1,13 @@
 ##### Win32 variables #####
 
-WIN32_EXE=dpmaster.exe
+WIN32_EXE=mpdirectory.exe
 WIN32_CFLAGS=-D_WIN32_WINNT=0x0501
 WIN32_LDFLAGS=-lws2_32
 WIN32_RM=del
 
 ##### Unix variables #####
 
-UNIX_EXE=dpmaster
+UNIX_EXE=mpdirectory
 UNIX_LDFLAGS=
 UNIX_RM=rm -f
 
@@ -17,7 +17,7 @@ CC=gcc
 CFLAGS_COMMON=-Wall
 CFLAGS_DEBUG=$(CFLAGS_COMMON) -g
 CFLAGS_RELEASE=$(CFLAGS_COMMON) -O2 -DNDEBUG
-OBJECTS=clients.o common.o dpmaster.o games.o messages.o servers.o system.o
+OBJECTS=clients.o common.o mpdirectory.o games.o messages.o servers.o system.o
 
 ##### Commands #####
 

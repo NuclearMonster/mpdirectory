@@ -1,7 +1,7 @@
 /*
 	common.h
 
-	Common header file for dpmaster
+	Common header file for mpdirectory
 
 	Copyright (C) 2004-2011  Mathieu Olivier
 

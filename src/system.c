@@ -1,7 +1,7 @@
 /*
 	system.c
 
-	System specific code for dpmaster
+	System specific code for mpdirectory
 
 	Copyright (C) 2008-2011  Mathieu Olivier
 
@@ -56,12 +56,12 @@ static int null_device = -1;
 
 // ---------- Public variables ---------- //
 
-// The master sockets
+// The directory sockets
 unsigned int nb_sockets = 0;
 listen_socket_t listen_sockets [MAX_LISTEN_SOCKETS];
 
 // The port we use by default
-unsigned short master_port = DEFAULT_MASTER_PORT;
+unsigned short directory_port = DEFAULT_MPDIRECTORY_PORT;
 
 // System specific command line options
 const cmdlineopt_t sys_cmdline_options [] =
@@ -172,7 +172,7 @@ static qboolean Sys_BuildSockaddr (const char* addr_name, const char* port_name,
 	// If there is no port, use the default one
 	if (port_name == NULL)
 	{
-		snprintf (port_buff, sizeof (port_buff), "%hu", master_port);
+		snprintf (port_buff, sizeof (port_buff), "%hu", directory_port);
 		port_buff[sizeof (port_buff) - 1] = '\0';
 		port_name = port_buff;
 	}

@@ -35,18 +35,17 @@ my %defaultProtocols = (
 	"DarkPlaces-Quake" => 3,
 	"Nexuiz" => 3,
 );
-my $defaultMasterAddr = "dpmaster.deathmask.net";
+my $defaultDirectoryAddr = "directory.ioquake3.org";
 
 
 my $nbArgs = scalar @ARGV;
 if ($nbArgs < 1 or $nbArgs > 3) {
-	print "Syntax: $0 [options] <game> [protocol number] [master]\n";
+	print "Syntax: $0 [options] <game> [protocol number] [directory]\n";
 	print "    Ex: $0 Nexuiz\n";
 	print "        $0 Quake3Arena\n";
 	print "        $0 RtCW\n";
 	print "        $0 WoET\n";
 	print "        $0 Warsow 10\n";
-	print "        $0 Warsow 5308 dpmaster.deathmask.net\n";
 	exit;
 }
 
@@ -60,15 +59,15 @@ else {
 	$protocol = $defaultProtocols{$gamename};
 }
 
-my $masterAddr;
+my $directoryAddr;
 if ($nbArgs > 2) {
-	$masterAddr = $ARGV[2];
+	$directoryAddr = $ARGV[2];
 }
 else {
-	$masterAddr = $defaultMasterAddr;
+	$directoryAddr = $defaultDirectoryAddr;
 }
 
-Master_SetProperty ("remoteAddress", $masterAddr);
+Directory_SetProperty ("remoteAddress", $directoryAddr);
 
 my $gamefamily;
 if ($gamename eq "Quake3Arena") {
@@ -88,8 +87,8 @@ Client_SetProperty ($clientRef, "ignoreEOTMarks", 1);
 Client_SetGameProperty ($clientRef, "gamename", $gamename);
 Client_SetGameProperty ($clientRef, "protocol", $protocol);
 
-if (IsAddressIpv6 ($masterAddr)) {
+if (IsAddressIpv6 ($directoryAddr)) {
 	Client_SetProperty ($clientRef, "useIPv6", 1);
 }
 
-Test_Run ("Querying $masterAddr for $gamename servers (protocol: $protocol)...", 3, 1);
+Test_Run ("Querying $directoryAddr for $gamename servers (protocol: $protocol)...", 3, 1);

@@ -17,6 +17,6 @@ Server_SetGameProperty ($serverRef, "gamename", $previousGamename);
 
 # 2nd test - a long key
 Server_SetGameProperty ($serverRef, $longValue, "dummyString");
-# We remove the "clients" property to force the master to parse the whole infostring
+# We remove the "clients" property to force the directory to parse the whole infostring
 Server_SetGameProperty ($serverRef, "clients", undef);
 Test_Run ("Buffer overflow in infostring, using a long key");
