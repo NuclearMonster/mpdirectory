@@ -28,4 +28,9 @@ to compile the debug version
 
 The resulting binary is just called `mpdirectory`
 
-Windows compiling:
+Want to mpdirectory under Docker?
+```
+git clone https://github.com/nuclearmonster/mpdirectory_docker
+cd mpdirectory
+docker compose up -d
+```
