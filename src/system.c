@@ -61,7 +61,7 @@ unsigned int nb_sockets = 0;
 listen_socket_t listen_sockets [MAX_LISTEN_SOCKETS];
 
 // The port we use by default
-unsigned short directory_port = DEFAULT_MPDIRECTORY_PORT;
+unsigned short directory_port = DEFAULT_DIRECTORY_PORT;
 
 // System specific command line options
 const cmdlineopt_t sys_cmdline_options [] =

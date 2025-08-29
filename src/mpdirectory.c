@@ -208,7 +208,7 @@ static const cmdlineopt_t cmdline_options [] =
 		"port",
 		"<port_num>",
 		"Default network port (default value: %d)",
-		{ DEFAULT_MASTER_PORT, 0 },
+		{ DEFAULT_DIRECTORY_PORT, 0 },
 		'p',
 		1,
 		1

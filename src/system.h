@@ -38,7 +38,7 @@
 #define MAX_LISTEN_SOCKETS 8
 
 // Default directory port
-#define DEFAULT_MPDIRECTORY_PORT 27950
+#define DEFAULT_DIRECTORY_PORT 27950
 
 // Network errors code
 #ifdef WIN32
