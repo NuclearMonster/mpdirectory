@@ -19,8 +19,10 @@ The main ioquake3 directory server is located at directory.ioquake3.org
 
 Compiling:
 Under Linux?
-```cd src
-make release``` 
+```
+cd src
+make release
+```
 or `make debug` 
 to compile the debug version
 
