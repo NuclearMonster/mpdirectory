@@ -17,8 +17,8 @@ Enemy Territory.
 
 The main ioquake3 directory server is located at directory.ioquake3.org
 
-Compiling:
-Under Linux?
+## Compiling:
+### Linux
 ```
 cd src
 make release
@@ -28,7 +28,7 @@ to compile the debug version
 
 The resulting binary is just called `mpdirectory`
 
-Want to mpdirectory under Docker?
+## Docker
 ```
 git clone https://github.com/nuclearmonster/mpdirectory_docker
 cd mpdirectory
