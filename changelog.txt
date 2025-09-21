@@ -7,6 +7,7 @@
 
 * Version 2.3:
  - Mild rebranding. All credit to previous authors.
+ - Built in Docker support by Ronny Trommer ( https://github.com/indigo423 )
 
 * Version 2.2:
   - Flood protection against abusive clients, by Timothee Besset
