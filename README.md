@@ -29,8 +29,14 @@ to compile the debug version
 The resulting binary is just called `mpdirectory`
 
 ## Docker
+
+Build OCI
+```bash
+docker build -t mpdirectory .
 ```
-git clone https://github.com/nuclearmonster/mpdirectory_docker
-cd mpdirectory
-docker compose up -d
+
+Running as a container
+
+```bash
+docker run --rm -p 27950:27950/udp mpdirectory -f
 ```
