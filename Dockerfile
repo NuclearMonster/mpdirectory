@@ -1,5 +1,5 @@
 # Build stage: use Alpine with build tools
-FROM alpine:3.22 AS builder
+FROM alpine:3.22.1 AS builder
 
 WORKDIR /usr/src
 
@@ -10,7 +10,7 @@ COPY ./src .
 RUN make release
 
 # Assemble runtime image
-FROM alpine:3.22
+FROM alpine:3.22.1
 
 COPY --from=builder /usr/src/mpdirectory .
 
